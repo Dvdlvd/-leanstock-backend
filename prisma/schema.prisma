@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  users     User[]
+  products  Product[]
+  locations Location[]
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  tenantId  String
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tokens RefreshToken[]
+}
+
+model Product {
+  id        String   @id @default(uuid())
+  name      String
+  price     Float
+  tenantId  String
+  createdAt DateTime @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  inventory Inventory[]
+}
+
+model Location {
+  id        String   @id @default(uuid())
+  name      String
+  tenantId  String
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  inventory Inventory[]
+}
+
+model Inventory {
+  id         String @id @default(uuid())
+  productId  String
+  locationId String
+  quantity   Int
+
+  product  Product  @relation(fields: [productId], references: [id])
+  location Location @relation(fields: [locationId], references: [id])
+
+  @@unique([productId, locationId])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String
+  userId    String
+  revoked   Boolean  @default(false)
+  expiresAt DateTime
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+enum Role {
+  USER
+  ADMIN
+  MANAGER
+  STAFF
+}
