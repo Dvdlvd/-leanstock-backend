@@ -1,0 +1,97 @@
+{
+    "info": {
+      "name": "LeanStock API",
+      "_postman_id": "12345678-abcd-1234-abcd-1234567890ab",
+      "description": "Postman collection for LeanStock inventory system",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Login",
+        "request": {
+          "method": "POST",
+          "header": [],
+          "url": {
+            "raw": "http://localhost:8000/auth/login",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "3000",
+            "path": ["auth", "login"]
+          }
+        }
+      },
+      {
+        "name": "Get Products",
+        "request": {
+          "method": "GET",
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer YOUR_TOKEN_HERE"
+            }
+          ],
+          "url": {
+            "raw": "http://localhost:8000/products",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "3000",
+            "path": ["products"]
+          }
+        }
+      },
+      {
+        "name": "Create Product",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer YOUR_TOKEN_HERE"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"Laptop\",\n  \"sku\": \"LAP-123\",\n  \"price\": 250000\n}"
+          },
+          "url": {
+            "raw": "http://localhost:3000/products",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "3000",
+            "path": ["products"]
+          }
+        }
+      },
+      {
+        "name": "Update Inventory",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer YOUR_TOKEN_HERE"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"product_id\": 1,\n  \"warehouse_id\": 2,\n  \"quantity\": 50\n}"
+          },
+          "url": {
+            "raw": "http://localhost:3000/inventory/update",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "3000",
+            "path": ["inventory", "update"]
+          }
+        }
+      }
+    ]
+  }

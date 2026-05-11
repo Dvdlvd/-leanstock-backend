@@ -1,15 +1,19 @@
 import express from "express";
 import cors from "cors";
-import { env } from "./config/env.js";
-import authRoutes from "./modules/auth/auth.routes.js";
-import { errorMiddleware } from "./middlewares/error.middleware.js";
-import productRoutes from "./modules/product/product.routes.js";
-import locationRoutes from "./modules/location/location.routes.js";
-import inventoryRoutes from "./modules/inventory/inventory.routes.js";
+
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 
-const swaggerDoc = YAML.load("./swagger.yaml");
+import { env } from "./config/env.js";
+
+import authRoutes from "./modules/auth/auth.routes.js";
+import productRoutes from "./modules/product/product.routes.js";
+import locationRoutes from "./modules/location/location.routes.js";
+import inventoryRoutes from "./modules/inventory/inventory.routes.js";
+
+import { errorMiddleware } from "./middlewares/error.middleware.js";
+
+const swaggerDocument = YAML.load("./openapi.yaml");
 
 const app = express();
 
@@ -19,10 +23,13 @@ app.use(cors({
   origin: env.corsOrigin
 }));
 
-app.use("/auth", authRoutes);
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerDocument)
+);
 
-// global error handler
-app.use(errorMiddleware);
+app.use("/auth", authRoutes);
 
 app.use("/products", productRoutes);
 
@@ -30,6 +37,6 @@ app.use("/locations", locationRoutes);
 
 app.use("/inventory", inventoryRoutes);
 
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+app.use(errorMiddleware);
 
 export default app;

@@ -7,6 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  MANAGER
+  STAFF
+  VIEWER
+}
+
 model Tenant {
   id        String   @id @default(uuid())
   name      String
@@ -18,62 +25,118 @@ model Tenant {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  role      Role     @default(USER)
-  tenantId  String
+  id String @id @default(uuid())
+
+  email String @unique
+
+  password String
+
+  role Role @default(VIEWER)
+
+  verified Boolean @default(false)
+
+  verificationToken String?
+
+  resetToken String?
+
+  resetTokenExpiry DateTime?
+
+  tenantId String
+
   createdAt DateTime @default(now())
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
+
   tokens RefreshToken[]
+
+  @@index([tenantId])
 }
 
 model Product {
-  id        String   @id @default(uuid())
-  name      String
-  price     Float
-  tenantId  String
-  createdAt DateTime @default(now())
+  id String @id @default(uuid())
+
+  name String
+
+  sku String @unique
+
+  price Float
+
+  quantity Int @default(0)
+
+  lowStock Boolean @default(false)
+
+  tenantId String
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
+
   inventory Inventory[]
+
+  createdAt DateTime @default(now())
 }
 
 model Location {
-  id        String   @id @default(uuid())
-  name      String
-  tenantId  String
+  id String @id @default(uuid())
+
+  name String
+
+  tenantId String
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
+
   inventory Inventory[]
+
+  @@index([tenantId])
 }
 
 model Inventory {
-  id         String @id @default(uuid())
+  id String @id @default(uuid())
+
   productId  String
   locationId String
-  quantity   Int
 
-  product  Product  @relation(fields: [productId], references: [id])
+  quantity Int
+
+  updatedAt DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id])
+
   location Location @relation(fields: [locationId], references: [id])
 
   @@unique([productId, locationId])
+  @@index([productId])
+  @@index([locationId])
 }
 
 model RefreshToken {
-  id        String   @id @default(uuid())
-  token     String
-  userId    String
-  revoked   Boolean  @default(false)
+  id String @id @default(uuid())
+
+  token String
+
+  userId String
+
+  revoked Boolean @default(false)
+
   expiresAt DateTime
 
+  createdAt DateTime @default(now())
+
   user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
-enum Role {
-  USER
-  ADMIN
-  MANAGER
-  STAFF
+model AuditLog {
+  id String @id @default(uuid())
+
+  action String
+
+  entity String
+
+  entityId String
+
+  userId String
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }

@@ -16,9 +16,9 @@
         "express": "^4.19.2",
         "express-rate-limit": "^7.0.0",
         "jsonwebtoken": "^9.0.2",
-        "swagger-ui-express": "^5.0.0",
+        "swagger-ui-express": "^5.0.1",
         "yamljs": "^0.3.0",
-        "zod": "^3.23.0"
+        "zod": "^3.25.76"
     },
     "devDependencies": {
         "jest": "^29.7.0",

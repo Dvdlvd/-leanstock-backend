@@ -1,23 +1,64 @@
 import { Router } from "express";
+
 import {
   register,
   login,
   refresh,
-  logout
+  logout,
+  verifyEmail,
+  forgotPassword,
+  changePassword
 } from "./auth.controller.js";
 
-import rateLimit from "express-rate-limit";
+import { validate }
+  from "../../middlewares/validate.middleware.js";
+
+import {
+  registerSchema,
+  loginSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema
+} from "./auth.schemas.js";
 
 const router = Router();
 
-const limiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 5
-});
+router.post(
+  "/register",
+  validate(registerSchema),
+  register
+);
 
-router.post("/register", limiter, register);
-router.post("/login", limiter, login);
-router.post("/refresh", refresh);
-router.post("/logout", logout);
+router.post(
+  "/login",
+  validate(loginSchema),
+  login
+);
+
+router.post(
+  "/refresh",
+  refresh
+);
+
+router.post(
+  "/logout",
+  logout
+);
+
+router.get(
+  "/verify/:token",
+  verifyEmail
+);
+
+router.post(
+  "/forgot-password",
+  validate(forgotPasswordSchema),
+  forgotPassword
+);
+
+router.post(
+  "/reset/:token",
+  validate(resetPasswordSchema),
+  changePassword
+);
 
 export default router;
