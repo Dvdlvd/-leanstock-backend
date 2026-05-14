@@ -69,7 +69,7 @@ model Product {
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
 
-  inventory Inventory[]
+  inventories Inventory[]
 
   createdAt DateTime @default(now())
 }

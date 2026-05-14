@@ -137,6 +137,7 @@ paths:
   /products:
     get:
       summary: Get all products
+
       security:
         - bearerAuth: []
 
@@ -146,26 +147,113 @@ paths:
 
     post:
       summary: Create product
+
       security:
         - bearerAuth: []
 
       requestBody:
         required: true
+
         content:
           application/json:
+
             schema:
               type: object
+
               properties:
                 name:
                   type: string
+
                 sku:
                   type: string
+
                 price:
                   type: number
+
+                quantity:
+                  type: integer
 
       responses:
         "200":
           description: Product created
+
+
+  /products/{id}:
+
+    get:
+      summary: Get one product
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+
+          schema:
+            type: string
+
+      responses:
+        "200":
+          description: Product found
+
+
+    put:
+      summary: Update product
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+
+          schema:
+            type: string
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+
+            schema:
+              type: object
+
+              properties:
+                name:
+                  type: string
+
+                price:
+                  type: number
+
+                quantity:
+                  type: integer
+
+      responses:
+        "200":
+          description: Product updated
+
+
+    delete:
+      summary: Delete product
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+
+          schema:
+            type: string
+
+      responses:
+        "200":
+          description: Product deleted
 
 components:
   securitySchemes:

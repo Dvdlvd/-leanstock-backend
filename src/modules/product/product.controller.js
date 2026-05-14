@@ -1,10 +1,9 @@
 import {
-  createProduct,
+  createProduct as createProductService,
   getProducts,
   getProductById,
   updateProduct,
-  deleteProduct,
-  updateInventory
+  deleteProduct
 } from "./product.service.js";
 
 
@@ -18,10 +17,10 @@ export const createProduct = async (
   try {
 
     const product =
-      await create({
-        ...req.body,
-        tenantId: req.user.tenantId
-      });
+      await createProductService(
+        req.body,
+        req.user.tenantId
+      );
 
     res.json(product);
 
@@ -34,7 +33,7 @@ export const createProduct = async (
 };
 
 
-// GET ALL PRODUCTS
+// GET PRODUCTS
 export const getAllProducts = async (
   req,
   res,
@@ -54,14 +53,14 @@ export const getAllProducts = async (
     const products =
       await getProducts({
 
+        tenantId:
+          req.user.tenantId,
+
         page,
         limit,
         search,
         sortBy,
-        order,
-
-        tenantId:
-          req.user.tenantId
+        order
       });
 
     res.json(products);
@@ -75,7 +74,7 @@ export const getAllProducts = async (
 };
 
 
-// GET ONE PRODUCT
+// GET ONE
 export const getOne = async (
   req,
   res,
@@ -85,32 +84,9 @@ export const getOne = async (
   try {
 
     const product =
-      await getById(req.params.id);
-
-    res.json(product);
-
-  } catch (error) {
-
-    next(error);
-
-  }
-
-};
-
-
-// UPDATE PRODUCT
-export const update = async (
-  req,
-  res,
-  next
-) => {
-
-  try {
-
-    const product =
-      await updateById(
+      await getProductById(
         req.params.id,
-        req.body
+        req.user.tenantId
       );
 
     res.json(product);
@@ -124,7 +100,34 @@ export const update = async (
 };
 
 
-// DELETE PRODUCT
+// UPDATE
+export const update = async (
+  req,
+  res,
+  next
+) => {
+
+  try {
+
+    const product =
+      await updateProduct(
+        req.params.id,
+        req.body,
+        req.user.tenantId
+      );
+
+    res.json(product);
+
+  } catch (error) {
+
+    next(error);
+
+  }
+
+};
+
+
+// DELETE
 export const remove = async (
   req,
   res,
@@ -133,7 +136,10 @@ export const remove = async (
 
   try {
 
-    await deleteById(req.params.id);
+    await deleteProduct(
+      req.params.id,
+      req.user.tenantId
+    );
 
     res.json({
       message: "Deleted"
