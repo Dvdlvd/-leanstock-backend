@@ -323,6 +323,58 @@ paths:
           description: Product reserved
 
 
+  /products/{id}/forecast:
+
+    get:
+      summary: Product demand forecast
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+
+          schema:
+            type: string
+
+      responses:
+        "200":
+          description: Forecast generated
+
+
+  /inventory:
+
+    post:
+      summary: Create inventory for location
+
+      security:
+        - bearerAuth: []
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              type: object
+
+              properties:
+                productId:
+                  type: string
+
+                locationId:
+                  type: string
+
+                quantity:
+                  type: integer
+
+      responses:
+        "200":
+          description: Inventory created
+
+
   /inventory/transfer:
 
     post:

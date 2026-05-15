@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { transfer } from "./inventory.controller.js";
+
+import {
+  createInventory,
+  transfer
+} from "./inventory.controller.js";
 
 import { authMiddleware }
   from "../../middlewares/auth.middleware.js";
@@ -9,10 +13,27 @@ import { requireRole }
 
 const router = Router();
 
+
+// CREATE INVENTORY
+router.post(
+  "/",
+  authMiddleware,
+  requireRole(
+    "ADMIN",
+    "MANAGER"
+  ),
+  createInventory
+);
+
+
+// TRANSFER
 router.post(
   "/transfer",
   authMiddleware,
-  requireRole("MANAGER"),
+  requireRole(
+    "ADMIN",
+    "MANAGER"
+  ),
   transfer
 );
 

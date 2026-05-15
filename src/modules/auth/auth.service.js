@@ -15,9 +15,6 @@ import {
 
 import { AppError } from "../../utils/errors.js";
 
-import {
-  sendVerificationEmail
-} from "../../utils/email.js";
 
 // REGISTER
 export const registerUser = async (
@@ -48,7 +45,9 @@ export const registerUser = async (
 
   const user =
     await prisma.user.create({
+
       data: {
+
         email,
 
         password: hashed,
@@ -62,17 +61,22 @@ export const registerUser = async (
             name: "Default Tenant"
           }
         }
+
       },
 
       include: {
         tenant: true
       }
+
     });
 
-  await sendVerificationEmail(
-    email,
-    verificationToken
-  );
+  console.log(`
+VERIFY EMAIL:
+
+http://localhost:3000/auth/verify/${verificationToken}
+
+sent to ${email}
+`);
 
   return {
     message:
@@ -80,6 +84,7 @@ export const registerUser = async (
   };
 
 };
+
 
 // LOGIN
 export const loginUser = async (
@@ -126,9 +131,13 @@ export const loginUser = async (
   }
 
   const payload = {
+
     userId: user.id,
+
     role: user.role,
+
     tenantId: user.tenantId
+
   };
 
   const accessToken =
@@ -138,7 +147,9 @@ export const loginUser = async (
     generateRefreshToken(payload);
 
   await prisma.refreshToken.create({
+
     data: {
+
       token: refreshToken,
 
       userId: user.id,
@@ -147,7 +158,9 @@ export const loginUser = async (
         Date.now() +
         7 * 24 * 60 * 60 * 1000
       )
+
     }
+
   });
 
   return {
@@ -156,6 +169,7 @@ export const loginUser = async (
   };
 
 };
+
 
 // REFRESH
 export const refreshTokens = async (
@@ -167,10 +181,12 @@ export const refreshTokens = async (
 
   const stored =
     await prisma.refreshToken.findFirst({
+
       where: {
         token,
         revoked: false
       }
+
     });
 
   if (!stored) {
@@ -183,9 +199,13 @@ export const refreshTokens = async (
   }
 
   const payload = {
+
     userId: decoded.userId,
+
     role: decoded.role,
+
     tenantId: decoded.tenantId
+
   };
 
   const newAccessToken =
@@ -197,17 +217,20 @@ export const refreshTokens = async (
 
 };
 
+
 // LOGOUT
 export const logoutUser = async (
   token
 ) => {
 
   await prisma.refreshToken.updateMany({
+
     where: { token },
 
     data: {
       revoked: true
     }
+
   });
 
   return {
@@ -216,6 +239,7 @@ export const logoutUser = async (
 
 };
 
+
 // VERIFY EMAIL
 export const verifyUserEmail = async (
   token
@@ -223,9 +247,11 @@ export const verifyUserEmail = async (
 
   const user =
     await prisma.user.findFirst({
+
       where: {
         verificationToken: token
       }
+
     });
 
   if (!user) {
@@ -238,6 +264,7 @@ export const verifyUserEmail = async (
   }
 
   await prisma.user.update({
+
     where: {
       id: user.id
     },
@@ -246,6 +273,7 @@ export const verifyUserEmail = async (
       verified: true,
       verificationToken: null
     }
+
   });
 
   return {
@@ -253,6 +281,7 @@ export const verifyUserEmail = async (
   };
 
 };
+
 
 // FORGOT PASSWORD
 export const requestPasswordReset = async (
@@ -277,9 +306,11 @@ export const requestPasswordReset = async (
     crypto.randomUUID();
 
   await prisma.user.update({
+
     where: { email },
 
     data: {
+
       resetToken: token,
 
       resetTokenExpiry:
@@ -287,7 +318,9 @@ export const requestPasswordReset = async (
           Date.now() +
           1000 * 60 * 15
         )
+
     }
+
   });
 
   console.log(`
@@ -303,6 +336,7 @@ http://localhost:3000/auth/reset/${token}
 
 };
 
+
 // RESET PASSWORD
 export const resetPassword = async (
   token,
@@ -311,13 +345,17 @@ export const resetPassword = async (
 
   const user =
     await prisma.user.findFirst({
+
       where: {
+
         resetToken: token,
 
         resetTokenExpiry: {
           gt: new Date()
         }
+
       }
+
     });
 
   if (!user) {
@@ -335,17 +373,21 @@ export const resetPassword = async (
     );
 
   await prisma.user.update({
+
     where: {
       id: user.id
     },
 
     data: {
+
       password: hashed,
 
       resetToken: null,
 
       resetTokenExpiry: null
+
     }
+
   });
 
   return {

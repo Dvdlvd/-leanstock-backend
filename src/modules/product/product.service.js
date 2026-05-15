@@ -21,10 +21,12 @@ export const createProduct = async (
     });
 
   if (existing) {
+
     throw new AppError(
       "SKU already exists",
       409
     );
+
   }
 
   const lowStock =
@@ -61,12 +63,14 @@ export const getProducts = async ({
     await prisma.product.findMany({
 
       where: {
+
         tenantId,
 
         name: {
           contains: search,
           mode: "insensitive"
         }
+
       },
 
       orderBy: {
@@ -83,12 +87,14 @@ export const getProducts = async ({
     await prisma.product.count({
 
       where: {
+
         tenantId,
 
         name: {
           contains: search,
           mode: "insensitive"
         }
+
       }
 
     });
@@ -359,5 +365,56 @@ export const reserveProduct =
     return {
       message: "Product reserved"
     };
+
+};
+
+
+// FORECAST
+export const getForecast = async (
+  id,
+  tenantId
+) => {
+
+  const product =
+    await prisma.product.findFirst({
+
+      where: {
+        id,
+        tenantId
+      }
+
+    });
+
+  if (!product) {
+
+    throw new AppError(
+      "Product not found",
+      404
+    );
+
+  }
+
+  // simple moving average simulation
+  const averageSales =
+    Math.floor(
+      Math.random() * 10
+    ) + 1;
+
+  const recommendedReorder =
+    averageSales * 7;
+
+  return {
+
+    product: product.name,
+
+    currentStock:
+      product.quantity,
+
+    averageDailySales:
+      averageSales,
+
+    recommendedReorder
+
+  };
 
 };

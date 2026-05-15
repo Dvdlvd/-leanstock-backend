@@ -4,7 +4,8 @@ import {
   getProductById,
   updateProduct,
   deleteProduct,
-  reserveProduct
+  reserveProduct,
+  getForecast
 } from "./product.service.js";
 
 
@@ -169,6 +170,32 @@ export const reserve = async (
       await reserveProduct(
         req.params.id,
         req.body.quantity
+      );
+
+    res.json(result);
+
+  } catch (error) {
+
+    next(error);
+
+  }
+
+};
+
+
+// FORECAST
+export const forecast = async (
+  req,
+  res,
+  next
+) => {
+
+  try {
+
+    const result =
+      await getForecast(
+        req.params.id,
+        req.user.tenantId
       );
 
     res.json(result);

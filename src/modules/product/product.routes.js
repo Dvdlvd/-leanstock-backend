@@ -6,7 +6,8 @@ import {
   getOne,
   update,
   remove,
-  reserve
+  reserve,
+  forecast
 } from "./product.controller.js";
 
 import { authMiddleware }
@@ -67,11 +68,19 @@ router.delete(
 );
 
 
-// RESERVE PRODUCT
+// RESERVE
 router.post(
   "/:id/reserve",
   authMiddleware,
   reserve
+);
+
+
+// FORECAST
+router.get(
+  "/:id/forecast",
+  authMiddleware,
+  forecast
 );
 
 export default router;
