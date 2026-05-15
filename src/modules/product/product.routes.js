@@ -5,25 +5,23 @@ import {
   getAllProducts,
   getOne,
   update,
-  remove
+  remove,
+  reserve
 } from "./product.controller.js";
 
-import {
-  authMiddleware
-} from "../../middlewares/auth.middleware.js";
+import { authMiddleware }
+  from "../../middlewares/auth.middleware.js";
 
-import {
-  requireRole
-} from "../../middlewares/rbac.middleware.js";
+import { requireRole }
+  from "../../middlewares/rbac.middleware.js";
 
 const router = Router();
-
-router.use(authMiddleware);
 
 
 // GET ALL
 router.get(
   "/",
+  authMiddleware,
   getAllProducts
 );
 
@@ -31,6 +29,7 @@ router.get(
 // GET ONE
 router.get(
   "/:id",
+  authMiddleware,
   getOne
 );
 
@@ -38,7 +37,11 @@ router.get(
 // CREATE
 router.post(
   "/",
-  requireRole("ADMIN", "MANAGER"),
+  authMiddleware,
+  requireRole(
+    "ADMIN",
+    "MANAGER"
+  ),
   createProduct
 );
 
@@ -46,7 +49,11 @@ router.post(
 // UPDATE
 router.put(
   "/:id",
-  requireRole("ADMIN", "MANAGER"),
+  authMiddleware,
+  requireRole(
+    "ADMIN",
+    "MANAGER"
+  ),
   update
 );
 
@@ -54,8 +61,17 @@ router.put(
 // DELETE
 router.delete(
   "/:id",
+  authMiddleware,
   requireRole("ADMIN"),
   remove
+);
+
+
+// RESERVE PRODUCT
+router.post(
+  "/:id/reserve",
+  authMiddleware,
+  reserve
 );
 
 export default router;

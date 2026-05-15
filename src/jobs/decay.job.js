@@ -1,18 +1,56 @@
+import cron from "node-cron";
+
 import prisma from "../prisma/client.js";
 
-export const runDecayJob = async () => {
-  const products = await prisma.product.findMany();
+cron.schedule(
+  "* * * * *",
+  async () => {
 
-  for (const product of products) {
-    if (product.price > 50) {
-      await prisma.product.update({
-        where: { id: product.id },
-        data: {
-          price: product.price * 0.9
+    console.log(
+      "Dead stock job started"
+    );
+
+    const thirtyDaysAgo =
+      new Date(
+        Date.now()
+        - 30 * 24 * 60 * 60 * 1000
+      );
+
+    const oldProducts =
+      await prisma.product.findMany({
+
+        where: {
+          createdAt: {
+            lt: thirtyDaysAgo
+          }
         }
-      });
-    }
-  }
 
-  console.log("Decay job executed");
-};
+      });
+
+    for (const product of oldProducts) {
+
+      const newPrice =
+        product.price * 0.9;
+
+      await prisma.product.update({
+
+        where: {
+          id: product.id
+        },
+
+        data: {
+          price: Number(
+            newPrice.toFixed(2)
+          )
+        }
+
+      });
+
+      console.log(
+        `Discount applied to ${product.name}`
+      );
+
+    }
+
+  }
+);

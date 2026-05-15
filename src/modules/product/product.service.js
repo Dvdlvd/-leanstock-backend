@@ -1,5 +1,8 @@
 import prisma from "../../prisma/client.js";
 
+import { reservations }
+  from "./reservation.store.js";
+
 import { AppError }
   from "../../utils/errors.js";
 
@@ -28,11 +31,13 @@ export const createProduct = async (
     data.quantity < 5;
 
   return prisma.product.create({
+
     data: {
       ...data,
       lowStock,
       tenantId
     }
+
   });
 
 };
@@ -71,6 +76,7 @@ export const getProducts = async ({
       skip,
 
       take: Number(limit)
+
     });
 
   const total =
@@ -84,6 +90,7 @@ export const getProducts = async ({
           mode: "insensitive"
         }
       }
+
     });
 
   return {
@@ -125,10 +132,12 @@ export const getProductById = async (
     });
 
   if (!product) {
+
     throw new AppError(
       "Product not found",
       404
     );
+
   }
 
   return product;
@@ -154,10 +163,12 @@ export const updateProduct = async (
     });
 
   if (!existing) {
+
     throw new AppError(
       "Product not found",
       404
     );
+
   }
 
   const lowStock =
@@ -196,14 +207,20 @@ export const deleteProduct = async (
     });
 
   if (!existing) {
+
     throw new AppError(
       "Product not found",
       404
     );
+
   }
 
   return prisma.product.delete({
-    where: { id }
+
+    where: {
+      id
+    }
+
   });
 
 };
@@ -227,10 +244,12 @@ export const updateInventory = async (
     });
 
   if (!product) {
+
     throw new AppError(
       "Product not found",
       404
     );
+
   }
 
   const lowStock =
@@ -248,5 +267,97 @@ export const updateInventory = async (
     }
 
   });
+
+};
+
+
+// RESERVE PRODUCT
+export const reserveProduct =
+  async (productId, quantity) => {
+
+    const product =
+      await prisma.product.findUnique({
+
+        where: {
+          id: productId
+        }
+
+      });
+
+    if (!product) {
+
+      throw new Error(
+        "Product not found"
+      );
+
+    }
+
+    if (product.quantity < quantity) {
+
+      throw new Error(
+        "Not enough stock"
+      );
+
+    }
+
+    await prisma.product.update({
+
+      where: {
+        id: productId
+      },
+
+      data: {
+
+        quantity: {
+          decrement: quantity
+        }
+
+      }
+
+    });
+
+    reservations.set(
+      productId,
+      quantity
+    );
+
+    setTimeout(async () => {
+
+      const reserved =
+        reservations.get(productId);
+
+      if (reserved) {
+
+        await prisma.product.update({
+
+          where: {
+            id: productId
+          },
+
+          data: {
+
+            quantity: {
+              increment: reserved
+            }
+
+          }
+
+        });
+
+        reservations.delete(
+          productId
+        );
+
+        console.log(
+          `Reservation expired for ${productId}`
+        );
+
+      }
+
+    }, 30000);
+
+    return {
+      message: "Product reserved"
+    };
 
 };

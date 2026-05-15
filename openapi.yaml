@@ -13,101 +13,133 @@ paths:
   /auth/register:
     post:
       summary: Register user
+
       requestBody:
         required: true
+
         content:
           application/json:
             schema:
               type: object
+
               properties:
                 email:
                   type: string
+
                 password:
                   type: string
+
                 role:
                   type: string
+
       responses:
         "200":
           description: User registered
 
+
   /auth/login:
     post:
       summary: Login user
+
       requestBody:
         required: true
+
         content:
           application/json:
             schema:
               type: object
+
               properties:
                 email:
                   type: string
+
                 password:
                   type: string
+
       responses:
         "200":
           description: Login success
 
+
   /auth/refresh:
     post:
       summary: Refresh access token
+
       requestBody:
         required: true
+
         content:
           application/json:
             schema:
               type: object
+
               properties:
                 refreshToken:
                   type: string
+
       responses:
         "200":
           description: Token refreshed
 
+
   /auth/logout:
     post:
       summary: Logout user
+
       requestBody:
         required: true
+
         content:
           application/json:
             schema:
               type: object
+
               properties:
                 refreshToken:
                   type: string
+
       responses:
         "200":
           description: Logged out
 
+
   /auth/verify/{token}:
     get:
       summary: Verify email
+
       parameters:
         - in: path
           name: token
           required: true
+
           schema:
             type: string
+
       responses:
         "200":
           description: Email verified
 
+
   /auth/forgot-password:
     post:
       summary: Request password reset
+
       requestBody:
         required: true
+
         content:
           application/json:
             schema:
               type: object
+
               properties:
                 email:
                   type: string
+
       responses:
         "200":
           description: Reset email sent
+
 
   /auth/reset/{token}:
     post:
@@ -117,15 +149,18 @@ paths:
         - in: path
           name: token
           required: true
+
           schema:
             type: string
 
       requestBody:
         required: true
+
         content:
           application/json:
             schema:
               type: object
+
               properties:
                 password:
                   type: string
@@ -133,6 +168,7 @@ paths:
       responses:
         "200":
           description: Password updated
+
 
   /products:
     get:
@@ -156,7 +192,6 @@ paths:
 
         content:
           application/json:
-
             schema:
               type: object
 
@@ -218,7 +253,6 @@ paths:
 
         content:
           application/json:
-
             schema:
               type: object
 
@@ -254,6 +288,74 @@ paths:
       responses:
         "200":
           description: Product deleted
+
+
+  /products/{id}/reserve:
+
+    post:
+      summary: Reserve product
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: id
+          required: true
+
+          schema:
+            type: string
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              type: object
+
+              properties:
+                quantity:
+                  type: integer
+
+      responses:
+        "200":
+          description: Product reserved
+
+
+  /inventory/transfer:
+
+    post:
+      summary: Transfer inventory between locations
+
+      security:
+        - bearerAuth: []
+
+      requestBody:
+        required: true
+
+        content:
+          application/json:
+            schema:
+              type: object
+
+              properties:
+                productId:
+                  type: string
+
+                fromLocationId:
+                  type: string
+
+                toLocationId:
+                  type: string
+
+                quantity:
+                  type: integer
+
+      responses:
+        "200":
+          description: Inventory transferred
+
 
 components:
   securitySchemes:

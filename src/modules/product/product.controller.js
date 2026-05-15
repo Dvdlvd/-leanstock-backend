@@ -3,7 +3,8 @@ import {
   getProducts,
   getProductById,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  reserveProduct
 } from "./product.service.js";
 
 
@@ -61,6 +62,7 @@ export const getAllProducts = async (
         search,
         sortBy,
         order
+
       });
 
     res.json(products);
@@ -144,6 +146,32 @@ export const remove = async (
     res.json({
       message: "Deleted"
     });
+
+  } catch (error) {
+
+    next(error);
+
+  }
+
+};
+
+
+// RESERVE
+export const reserve = async (
+  req,
+  res,
+  next
+) => {
+
+  try {
+
+    const result =
+      await reserveProduct(
+        req.params.id,
+        req.body.quantity
+      );
+
+    res.json(result);
 
   } catch (error) {
 

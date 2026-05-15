@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 
+import "./jobs/decay.job.js";
+
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
 
