@@ -113,11 +113,12 @@ export const update = async (
   try {
 
     const product =
-      await updateProduct(
-        req.params.id,
-        req.body,
-        req.user.tenantId
-      );
+     await updateProduct(
+      req.params.id,
+      req.body,
+      req.user.tenantId,
+      req.user.userId
+    );
 
     res.json(product);
 

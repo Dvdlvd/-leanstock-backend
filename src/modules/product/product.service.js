@@ -3,6 +3,9 @@ import prisma from "../../prisma/client.js";
 import { reservations }
   from "./reservation.store.js";
 
+import { createAuditLog }
+  from "../../utils/audit.js";
+
 import { AppError }
   from "../../utils/errors.js";
 
@@ -15,9 +18,11 @@ export const createProduct = async (
 
   const existing =
     await prisma.product.findUnique({
+
       where: {
         sku: data.sku
       }
+
     });
 
   if (existing) {
@@ -155,7 +160,8 @@ export const getProductById = async (
 export const updateProduct = async (
   id,
   data,
-  tenantId
+  tenantId,
+  userId
 ) => {
 
   const existing =
@@ -180,18 +186,46 @@ export const updateProduct = async (
   const lowStock =
     data.quantity < 5;
 
-  return prisma.product.update({
+  const updated =
+    await prisma.product.update({
 
-    where: {
-      id
-    },
+      where: {
+        id
+      },
 
-    data: {
-      ...data,
-      lowStock
-    }
+      data: {
+        ...data,
+        lowStock
+      }
 
-  });
+    });
+
+  // AUDIT LOG
+  if (
+    data.price &&
+    data.price !== existing.price
+  ) {
+
+    await createAuditLog({
+
+      action: "PRICE_UPDATE",
+
+      entity: "PRODUCT",
+
+      entityId: id,
+
+      details:
+        `${existing.name}: ${existing.price} -> ${data.price}`,
+
+      userId,
+
+      tenantId
+
+    });
+
+  }
+
+  return updated;
 
 };
 

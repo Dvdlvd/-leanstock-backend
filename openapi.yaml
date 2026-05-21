@@ -171,6 +171,7 @@ paths:
 
 
   /products:
+
     get:
       summary: Get all products
 
@@ -180,6 +181,7 @@ paths:
       responses:
         "200":
           description: Products list
+
 
     post:
       summary: Create product
@@ -342,6 +344,27 @@ paths:
       responses:
         "200":
           description: Forecast generated
+
+
+  /inventory/location/{locationId}:
+
+    get:
+      summary: Get inventory by location
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: locationId
+          required: true
+
+          schema:
+            type: string
+
+      responses:
+        "200":
+          description: Inventory list
 
 
   /inventory:

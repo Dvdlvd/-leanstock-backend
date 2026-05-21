@@ -1,21 +1,76 @@
-version: "3.9"
-
 services:
-  db:
+
+  backend:
+
+    build: .
+
+    container_name: leanstock-backend
+
+    ports:
+      - "3000:3000"
+
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/leanstock
+      JWT_SECRET_KEY: secret
+      JWT_REFRESH_SECRET_KEY: refreshsecret
+      RESEND_API_KEY: ${RESEND_API_KEY}
+
+    depends_on:
+      - postgres
+      - redis
+
+    volumes:
+      - .:/app
+
+    command: npm run dev
+
+
+  frontend:
+
+    platform: linux/amd64
+
+    build: ./frontend
+
+    container_name: leanstock-frontend
+
+    ports:
+      - "5173:5173"
+
+    volumes:
+      - ./frontend:/app
+
+    command: npm run dev -- --host
+
+
+  postgres:
+
     image: postgres:15
+
+    container_name: leanstock-postgres
+
     restart: always
+
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: app
+      POSTGRES_DB: leanstock
+
     ports:
       - "5432:5432"
 
-  app:
-    build: .
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+  redis:
+
+    image: redis:7
+
+    container_name: leanstock-redis
+
     ports:
-      - "3000:3000"
-    depends_on:
-      - db
-    env_file:
-      - .env
+      - "6379:6379"
+
+
+volumes:
+  postgres_data:

@@ -1,4 +1,9 @@
+// src/modules/auth/auth.service.js
+
 import prisma from "../../prisma/client.js";
+
+import { sendEmail }
+  from "../../services/email.service.js";
 
 import {
   hashPassword,
@@ -13,7 +18,8 @@ import {
   verifyRefreshToken
 } from "../../utils/jwt.js";
 
-import { AppError } from "../../utils/errors.js";
+import { AppError }
+  from "../../utils/errors.js";
 
 
 // REGISTER
@@ -70,13 +76,36 @@ export const registerUser = async (
 
     });
 
-  console.log(`
-VERIFY EMAIL:
+  await sendEmail(
+    user.email,
+    "Verify your LeanStock account",
+    `
+      <div style="font-family:sans-serif;">
 
-http://localhost:3000/auth/verify/${verificationToken}
+        <h1>LeanStock</h1>
 
-sent to ${email}
-`);
+        <p>
+          Click below to verify your email:
+        </p>
+
+        <a
+          href="http://localhost:3000/auth/verify/${verificationToken}"
+          style="
+            background:black;
+            color:white;
+            padding:12px 20px;
+            border-radius:8px;
+            text-decoration:none;
+            display:inline-block;
+            margin-top:10px;
+          "
+        >
+          Verify Email
+        </a>
+
+      </div>
+    `
+  );
 
   return {
     message:
@@ -323,11 +352,36 @@ export const requestPasswordReset = async (
 
   });
 
-  console.log(`
-PASSWORD RESET LINK:
+  await sendEmail(
+    user.email,
+    "Reset Password",
+    `
+      <div style="font-family:sans-serif;">
 
-http://localhost:3000/auth/reset/${token}
-`);
+        <h1>Password Reset</h1>
+
+        <p>
+          Click below to reset password:
+        </p>
+
+        <a
+          href="http://localhost:3000/auth/reset/${token}"
+          style="
+            background:red;
+            color:white;
+            padding:12px 20px;
+            border-radius:8px;
+            text-decoration:none;
+            display:inline-block;
+            margin-top:10px;
+          "
+        >
+          Reset Password
+        </a>
+
+      </div>
+    `
+  );
 
   return {
     message:

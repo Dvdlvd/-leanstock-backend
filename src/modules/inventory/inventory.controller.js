@@ -1,3 +1,5 @@
+// src/modules/inventory/inventory.controller.js
+
 import prisma from "../../prisma/client.js";
 
 import { AppError }
@@ -60,8 +62,40 @@ export const createInventory = async (
 };
 
 
+// GET INVENTORY BY LOCATION
+export const getInventoryByLocation =
+  async (req, res, next) => {
+
+    try {
+
+      const inventory =
+        await prisma.inventory.findMany({
+
+          where: {
+            locationId:
+              req.params.locationId
+          },
+
+          include: {
+            product: true,
+            location: true
+          }
+
+        });
+
+      res.json(inventory);
+
+    } catch (error) {
+
+      next(error);
+
+    }
+
+};
+
+
 // TRANSFER INVENTORY
-export const transfer = async (
+export const transferInventory = async (
   req,
   res,
   next
@@ -161,6 +195,32 @@ export const transfer = async (
           });
 
         }
+
+        await tx.auditLog.create({
+
+          data: {
+
+            action:
+              "TRANSFER_INVENTORY",
+
+            entity:
+              "Inventory",
+
+            entityId:
+              productId,
+
+            details:
+              `Transferred ${quantity} units`,
+
+            tenantId:
+              req.user.tenantId,
+
+            userId:
+              req.user.userId
+
+          }
+
+        });
 
       }
     );

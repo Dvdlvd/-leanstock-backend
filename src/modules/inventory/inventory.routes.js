@@ -1,8 +1,11 @@
+// src/modules/inventory/inventory.routes.js
+
 import { Router } from "express";
 
 import {
   createInventory,
-  transfer
+  transferInventory,
+  getInventoryByLocation
 } from "./inventory.controller.js";
 
 import { authMiddleware }
@@ -26,7 +29,15 @@ router.post(
 );
 
 
-// TRANSFER
+// GET INVENTORY BY LOCATION
+router.get(
+  "/location/:locationId",
+  authMiddleware,
+  getInventoryByLocation
+);
+
+
+// TRANSFER INVENTORY
 router.post(
   "/transfer",
   authMiddleware,
@@ -34,7 +45,7 @@ router.post(
     "ADMIN",
     "MANAGER"
   ),
-  transfer
+  transferInventory
 );
 
 export default router;
